@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import type {Node} from 'react';
 import {
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
+  RefreshControl,
   useColorScheme,
   View,
-  Image,
+  Alert,
 } from 'react-native';
 
 import {
@@ -19,6 +19,7 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import NewsComponent from '../components/NewsComponent';
+import {useIsFocused} from '@react-navigation/native';
 
 const date = new Date();
 let url =
@@ -29,36 +30,65 @@ let url =
   'apiKey=c5fb20aacb404653a7ceb53719e65f1c';
 
 const NewsScreen: () => Node = () => {
+  const isFocused = useIsFocused();
   const isDarkMode = useColorScheme() === 'dark';
   const [news, setNews] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
   let req = new Request(url);
 
+  const wait = timeout => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+  };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchNews();
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
+
   async function fetchNews() {
-    await fetch(req)
-      .then(response => response.json())
-      .then(json => {
-        setNews(json.articles);
-      });
+    try {
+      setRefreshing(true);
+      await fetch(req)
+        .then(response => response.json())
+        .then(json => {
+          if (json.status === 'ok') {
+            setNews(json.articles);
+          } else {
+            Alert.alert(json.status, json.message);
+          }
+        });
+      setRefreshing(false);
+    } catch (e) {
+      Alert.alert('Error', e);
+    }
   }
   useEffect(() => {
-    // fetchNews();
-  });
+    if (isFocused) {
+      fetchNews();
+    }
+  }, [isFocused]);
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
   return (
-    <ScrollView style={backgroundStyle}>
-      {news.map(function (newItem, index) {
-        return (
-          <NewsComponent
-            key={String(index)}
-            author={newItem.author}
-            title={newItem.title}
-            description={newItem.description}
-            urlToImage={newItem.urlToImage}
-          />
-        );
-      })}
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      style={backgroundStyle}>
+      {news.length != 0 &&
+        news.map(function (newItem, index) {
+          return (
+            <NewsComponent
+              key={String(index)}
+              author={newItem.author}
+              title={newItem.title}
+              description={newItem.description}
+              urlToImage={newItem.urlToImage}
+            />
+          );
+        })}
     </ScrollView>
   );
 };
@@ -66,6 +96,6 @@ export default NewsScreen;
 
 const styles = StyleSheet.create({
   mainStyle: {
-    height: '100%',
+    flex: 1,
   },
 });

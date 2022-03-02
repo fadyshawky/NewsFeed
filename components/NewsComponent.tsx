@@ -54,9 +54,10 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   imageStyle: {
-    height: 250,
+    height: 200,
     width: '100%',
     marginBottom: 5,
+    resizeMode: 'contain',
   },
   titleStyle: {
     fontSize: 18,
