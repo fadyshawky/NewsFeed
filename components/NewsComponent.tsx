@@ -21,7 +21,9 @@ import {
 
 function NewsComponent(context: News) {
   return (
-    <TouchableOpacity style={styles.containerStyle}>
+    <TouchableOpacity
+      onPress={context.selectFunction}
+      style={styles.containerStyle}>
       <Text style={styles.titleStyle}>{context.title}</Text>
       <Text style={styles.authorStyle}>{`by- ${context.author}`}</Text>
       <Image style={styles.imageStyle} source={{uri: context.urlToImage}} />
@@ -31,6 +33,7 @@ function NewsComponent(context: News) {
 }
 
 interface News {
+  selectFunction: Function;
   author: string;
   title: string;
   description: string;

@@ -21,19 +21,23 @@ import {
 import NewsComponent from '../components/NewsComponent';
 import {useIsFocused} from '@react-navigation/native';
 
-const date = new Date();
+const date = new Date().toISOString().slice(0, 10);
 let url =
   'https://newsapi.org/v2/everything?' +
-  'q=Apple&' +
-  'from=2022-03-02&' +
+  'q=apple&' +
+  'from=' +
+  '' +
+  date +
+  '&' +
   'sortBy=popularity&' +
   'apiKey=c5fb20aacb404653a7ceb53719e65f1c';
 
-const NewsScreen: () => Node = () => {
+const NewsScreen = ({navigation}) => {
   const isFocused = useIsFocused();
   const isDarkMode = useColorScheme() === 'dark';
   const [news, setNews] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [searchText, setSearchText] = useState('');
   let req = new Request(url);
 
   const wait = timeout => {
@@ -52,6 +56,7 @@ const NewsScreen: () => Node = () => {
       await fetch(req)
         .then(response => response.json())
         .then(json => {
+          console.log('%c⧭', 'color: #731d1d', json.articles[0].content);
           if (json.status === 'ok') {
             setNews(json.articles);
           } else {
@@ -65,12 +70,22 @@ const NewsScreen: () => Node = () => {
   }
   useEffect(() => {
     if (isFocused) {
-      fetchNews();
+      // fetchNews();
     }
   }, [isFocused]);
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  function articleSelect(article) {
+    navigation.navigate({
+      name: 'ArticleScreen',
+      params: {
+        article: article,
+      },
+    });
+  }
+
   return (
     <ScrollView
       refreshControl={
@@ -81,6 +96,7 @@ const NewsScreen: () => Node = () => {
         news.map(function (newItem, index) {
           return (
             <NewsComponent
+              selectFunction={() => articleSelect(newItem)}
               key={String(index)}
               author={newItem.author}
               title={newItem.title}

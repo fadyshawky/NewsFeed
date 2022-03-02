@@ -13,8 +13,9 @@ import {
   View,
 } from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import ArticleScreen from '../pages/ArticleScreen';
 const Tab = createBottomTabNavigator();
-
+const Stack = createNativeStackNavigator();
 function MyTabs() {
   return (
     <Tab.Navigator>
@@ -24,4 +25,17 @@ function MyTabs() {
   );
 }
 
-export default MyTabs;
+function RootStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        options={{headerShown: false}}
+        name="TabStack"
+        component={MyTabs}
+      />
+      <Stack.Screen name="ArticleScreen" component={ArticleScreen} />
+    </Stack.Navigator>
+  );
+}
+
+export default RootStack;

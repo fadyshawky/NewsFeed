@@ -26,7 +26,8 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import {NavigationContainer} from '@react-navigation/native';
-import MyTabs from './navigation/Navigation';
+
+import RootStack from './navigation/Navigation';
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -39,7 +40,7 @@ const App: () => Node = () => {
     <NavigationContainer>
       <SafeAreaView style={backgroundStyle} />
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      {MyTabs()}
+      {RootStack()}
     </NavigationContainer>
   );
 };
