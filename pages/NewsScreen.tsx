@@ -9,6 +9,7 @@ import {
   useColorScheme,
   View,
   Alert,
+  Text,
 } from 'react-native';
 
 import {
@@ -20,17 +21,9 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import NewsComponent from '../components/NewsComponent';
 import {useIsFocused} from '@react-navigation/native';
+import SearchTextInput from '../SearchTextInput';
 
 const date = new Date().toISOString().slice(0, 10);
-let url =
-  'https://newsapi.org/v2/everything?' +
-  'q=apple&' +
-  'from=' +
-  '' +
-  date +
-  '&' +
-  'sortBy=popularity&' +
-  'apiKey=c5fb20aacb404653a7ceb53719e65f1c';
 
 const NewsScreen = ({navigation}) => {
   const isFocused = useIsFocused();
@@ -38,6 +31,17 @@ const NewsScreen = ({navigation}) => {
   const [news, setNews] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState('');
+
+  let url =
+    'https://newsapi.org/v2/everything?' +
+    'q=Apple&' +
+    'from=' +
+    '' +
+    date +
+    '&' +
+    'sortBy=popularity&' +
+    'apiKey=c5fb20aacb404653a7ceb53719e65f1c';
+
   let req = new Request(url);
 
   const wait = timeout => {
@@ -46,17 +50,17 @@ const NewsScreen = ({navigation}) => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchNews();
+    fetchNews(req);
     wait(2000).then(() => setRefreshing(false));
   }, []);
 
-  async function fetchNews() {
+  async function fetchNews(url) {
     try {
       setRefreshing(true);
-      await fetch(req)
+      await fetch(url)
         .then(response => response.json())
         .then(json => {
-          console.log('%c⧭', 'color: #731d1d', json.articles[0].content);
+          console.log('%c⧭', 'color: #731d1d', json);
           if (json.status === 'ok') {
             setNews(json.articles);
           } else {
@@ -86,12 +90,42 @@ const NewsScreen = ({navigation}) => {
     });
   }
 
+  function handleSearch(text: string) {
+    setSearchText(text);
+    let searchUrl =
+      'https://newsapi.org/v2/everything?' +
+      'q=' +
+      text +
+      '&' +
+      'from=' +
+      '' +
+      date +
+      '&' +
+      'sortBy=popularity&' +
+      'apiKey=c5fb20aacb404653a7ceb53719e65f1c';
+
+    let searchReq = new Request(searchUrl);
+    if (text != '') {
+      fetchNews(searchReq);
+    } else {
+      fetchNews(req);
+    }
+  }
+
   return (
     <ScrollView
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
       style={backgroundStyle}>
+      <SearchTextInput
+        style={styles.SearchBar}
+        onChangeText={text => handleSearch(text)}
+        placeholder={'Search'}
+        placeholderTextColor={'#999999'}
+        autoCorrect={false}
+        defaultValue={searchText}
+      />
       {news.length != 0 &&
         news.map(function (newItem, index) {
           return (
@@ -105,6 +139,11 @@ const NewsScreen = ({navigation}) => {
             />
           );
         })}
+      {news.length === 0 && (
+        <Text style={styles.noNewsStyle}>
+          {'No Articles Found\n\nPull page down to refresh'}
+        </Text>
+      )}
     </ScrollView>
   );
 };
@@ -113,5 +152,24 @@ export default NewsScreen;
 const styles = StyleSheet.create({
   mainStyle: {
     flex: 1,
+  },
+  SearchBar: {
+    width: '90%',
+    fontSize: 18,
+    alignSelf: 'center',
+    textAlign: 'left',
+    backgroundColor: Colors.white,
+    marginVertical: 5,
+    borderRadius: 15,
+    padding: '2%',
+    color: 'black',
+    borderWidth: 1,
+    borderColor: 'blue',
+  },
+  noNewsStyle: {
+    alignSelf: 'center',
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
