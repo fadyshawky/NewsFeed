@@ -26,7 +26,7 @@ let url =
   'q=Apple&' +
   'from=2022-03-02&' +
   'sortBy=popularity&' +
-  'apiKey=9512d53b64394c13b127e5cf1659540e';
+  'apiKey=c5fb20aacb404653a7ceb53719e65f1c';
 
 const NewsScreen: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -36,30 +36,29 @@ const NewsScreen: () => Node = () => {
   async function fetchNews() {
     await fetch(req)
       .then(response => response.json())
-      .then(json => setNews(json.articles));
-
-    console.log('%c⧭', 'color: #aa00ff', news);
+      .then(json => {
+        setNews(json.articles);
+      });
   }
   useEffect(() => {
-    fetchNews();
+    // fetchNews();
   });
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
   return (
     <ScrollView style={backgroundStyle}>
-      {news.length != 0 &&
-        news.map(function (newItem, index) {
-          return (
-            <NewsComponent
-              key={String(index)}
-              author={newItem.author}
-              title={newItem.title}
-              description={newItem.description}
-              urlToImage={newItem.urlToImage}
-            />
-          );
-        })}
+      {news.map(function (newItem, index) {
+        return (
+          <NewsComponent
+            key={String(index)}
+            author={newItem.author}
+            title={newItem.title}
+            description={newItem.description}
+            urlToImage={newItem.urlToImage}
+          />
+        );
+      })}
     </ScrollView>
   );
 };
