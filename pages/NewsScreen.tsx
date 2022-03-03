@@ -115,6 +115,9 @@ const NewsScreen = ({navigation}: {navigation: any}) => {
       '' +
       date +
       '&' +
+      'language=' +
+      lang +
+      '&' +
       'sortBy=popularity&' +
       'apiKey=c5fb20aacb404653a7ceb53719e65f1c';
 
