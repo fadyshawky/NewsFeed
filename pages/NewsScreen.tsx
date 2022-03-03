@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const date = new Date().toISOString().slice(0, 10);
 
-const NewsScreen = ({navigation}) => {
+const NewsScreen = ({navigation}: {navigation: any}) => {
   const isFocused = useIsFocused();
   const isDarkMode = useColorScheme() === 'dark';
   const [news, setNews] = useState([]);
@@ -49,7 +49,7 @@ const NewsScreen = ({navigation}) => {
   let arReq = new Request(arUrl);
   let enReq = new Request(enUrl);
 
-  const wait = timeout => {
+  const wait = (timeout: number | undefined) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
   };
 
@@ -78,7 +78,7 @@ const NewsScreen = ({navigation}) => {
         });
       setRefreshing(false);
     } catch (e) {
-      Alert.alert('Error', e);
+      Alert.alert('Error', 'something happened');
     }
   }
   useEffect(() => {
@@ -99,7 +99,6 @@ const NewsScreen = ({navigation}) => {
     });
   }
 
-  console.log('%c⧭', 'color: #f279ca', isDarkMode);
   async function handleSearch(text: string) {
     setSearchText(text);
     const lang = await AsyncStorage.getItem('@language');
@@ -134,10 +133,10 @@ const NewsScreen = ({navigation}) => {
           <NewsComponent
             selectFunction={() => articleSelect(newItem)}
             key={String(index)}
-            author={newItem.author}
-            title={newItem.title}
-            description={newItem.description}
-            urlToImage={newItem.urlToImage}
+            author={newItem['author']}
+            title={newItem['title']}
+            description={newItem['description']}
+            urlToImage={newItem['urlToImage']}
           />
         );
       })
@@ -149,7 +148,7 @@ const NewsScreen = ({navigation}) => {
       {!refreshing && (
         <SearchTextInput
           style={styles.SearchBar}
-          onChangeText={text => handleSearch(text)}
+          onChangeText={(text: string) => handleSearch(text)}
           placeholder={strings.search}
           placeholderTextColor={'black'}
           autoCorrect={false}

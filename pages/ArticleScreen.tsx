@@ -1,28 +1,17 @@
-import React, {useEffect, useState, useCallback} from 'react';
-import type {Node} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
-  RefreshControl,
   useColorScheme,
   View,
   Image,
   Text,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-import NewsComponent from '../components/NewsComponent';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {useIsFocused} from '@react-navigation/native';
 
-const ArticleScreen = ({navigation, route}) => {
+const ArticleScreen = ({navigation, route}: {navigation: any; route: any}) => {
   const {article} = route.params;
   const isFocused = useIsFocused();
   const isDarkMode = useColorScheme() === 'dark';
@@ -58,20 +47,19 @@ const ArticleScreen = ({navigation, route}) => {
   function ArticleComponent(articleItem: Article) {
     return (
       <>
-        <Text style={titleStyle}>{articleItem.title}</Text>
+        <Text style={titleStyle as any}>{articleItem.title}</Text>
         <View style={styles.row}>
-          <Text style={authorStyle}>{`By- ${articleItem.author}`}</Text>
+          <Text style={authorStyle as any}>{`By- ${articleItem.author}`}</Text>
           <Text
-            style={authorStyle}>{`published at ${articleItem.publishedAt.slice(
-            0,
-            10,
-          )}`}</Text>
+            style={
+              authorStyle as any
+            }>{`published at ${articleItem.publishedAt.slice(0, 10)}`}</Text>
         </View>
         <Image
           style={styles.imageStyle}
           source={{uri: articleItem.urlToImage}}
         />
-        <Text style={contentStyle}>{articleItem.content}</Text>
+        <Text style={contentStyle as any}>{articleItem.content}</Text>
       </>
     );
   }

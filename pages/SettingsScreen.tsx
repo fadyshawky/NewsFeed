@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import type {Node} from 'react';
+import type {ReactNode} from 'react';
 import {useColorScheme, View, Switch, Text} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import strings from '../Localization';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
 
-const SettingsScreen: () => Node = () => {
+const SettingsScreen = () => {
   const isDarkMode = useColorScheme() === 'dark';
   const isFocused = useIsFocused();
   const [isLangEnabled, setLangEnabled] = useState(false);
@@ -57,6 +57,7 @@ const SettingsScreen: () => Node = () => {
     width: '60%',
     alignSelf: 'center',
   };
+
   const textLabelStyle = {
     fontSize: 16,
     fontWeight: '400',
@@ -64,14 +65,14 @@ const SettingsScreen: () => Node = () => {
   };
   const LanguageSwitch = () => {
     return (
-      <View style={switchContainerStyle}>
-        <Text style={textLabelStyle}>{strings.enLanguage}</Text>
+      <View style={switchContainerStyle as any}>
+        <Text style={textLabelStyle as any}>{strings.enLanguage}</Text>
         <Switch
           trackColor={{false: 'black', true: 'black'}}
           onValueChange={toggleLangSwitch}
           value={isLangEnabled}
         />
-        <Text style={textLabelStyle}>{strings.arLanguage}</Text>
+        <Text style={textLabelStyle as any}>{strings.arLanguage}</Text>
       </View>
     );
   };
@@ -85,7 +86,7 @@ const SettingsScreen: () => Node = () => {
   };
 
   return (
-    <View style={backgroundStyle}>
+    <View style={backgroundStyle as any}>
       <LanguageSwitch />
     </View>
   );

@@ -7,7 +7,7 @@
  */
 
 import React, {useEffect} from 'react';
-import type {Node} from 'react';
+import type {ReactNode} from 'react';
 import {
   SafeAreaView,
   StatusBar,
@@ -26,7 +26,7 @@ import RootStack from './navigation/Navigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import strings from './Localization';
 
-const App: () => Node = () => {
+const App: () => ReactNode = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   async function getStorageItems() {
