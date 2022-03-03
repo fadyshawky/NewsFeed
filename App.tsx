@@ -9,6 +9,7 @@
 import React, {useEffect} from 'react';
 import type {ReactNode} from 'react';
 import {
+  Linking,
   SafeAreaView,
   StatusBar,
   StyleSheet,
