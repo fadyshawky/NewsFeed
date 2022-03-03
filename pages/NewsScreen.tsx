@@ -16,7 +16,7 @@ import SearchTextInput from '../SearchTextInput';
 import strings from '../Localization';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const date = new Date().toISOString().slice(0, 10);
+const date: any = new Date().toISOString().slice(0, 10);
 
 const NewsScreen = ({navigation}: {navigation: any}) => {
   const isFocused = useIsFocused();
@@ -67,16 +67,19 @@ const NewsScreen = ({navigation}: {navigation: any}) => {
   async function fetchNews(url: Request) {
     try {
       setRefreshing(true);
+      setNews([]);
       await fetch(url)
         .then(response => response.json())
         .then(json => {
           if (json.status === 'ok') {
-            setNews(json.articles);
+            if (json.articles.length != 0) {
+              setNews(json.articles);
+            }
           } else {
             Alert.alert(json.status, json.message);
           }
         });
-      setRefreshing(false);
+      wait(2000).then(() => setRefreshing(false));
     } catch (e) {
       Alert.alert('Error', 'something happened');
     }
@@ -101,6 +104,7 @@ const NewsScreen = ({navigation}: {navigation: any}) => {
 
   async function handleSearch(text: string) {
     setSearchText(text);
+
     const lang = await AsyncStorage.getItem('@language');
     let searchUrl =
       'https://newsapi.org/v2/everything?' +
@@ -110,9 +114,6 @@ const NewsScreen = ({navigation}: {navigation: any}) => {
       'from=' +
       '' +
       date +
-      '&' +
-      'language=' +
-      lang +
       '&' +
       'sortBy=popularity&' +
       'apiKey=c5fb20aacb404653a7ceb53719e65f1c';
