@@ -22,7 +22,7 @@ import {
 function NewsComponent(context: News) {
   const isDarkMode = useColorScheme() === 'dark';
 
-  const containerStyle = {
+  const containerStyle: any = {
     width: '95%',
     alignSelf: 'center',
     justifyContent: 'space-evenly',
@@ -37,20 +37,20 @@ function NewsComponent(context: News) {
     borderRadius: 15,
   };
 
-  const titleStyle = {
+  const titleStyle: any = {
     fontSize: 18,
     fontWeight: 'bold',
     color: isDarkMode ? Colors.lighter : Colors.darker,
   };
 
-  const authorStyle = {
+  const authorStyle: any = {
     fontSize: 14,
     fontWeight: '300',
     marginVertical: 5,
     color: isDarkMode ? Colors.lighter : Colors.darker,
   };
 
-  const descriptionStyle = {
+  const descriptionStyle: any = {
     fontSize: 14,
     marginVertical: 5,
     color: isDarkMode ? Colors.lighter : Colors.darker,
@@ -66,7 +66,7 @@ function NewsComponent(context: News) {
 }
 
 interface News {
-  selectFunction: Function;
+  selectFunction: any;
   author: string;
   title: string;
   description: string;
