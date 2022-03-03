@@ -1,27 +1,20 @@
 import React, {useEffect, useState, useCallback} from 'react';
-import type {Node} from 'react';
 import {
-  SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
   RefreshControl,
   useColorScheme,
-  View,
   Alert,
   Text,
+  ActivityIndicator,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import NewsComponent from '../components/NewsComponent';
 import {useIsFocused} from '@react-navigation/native';
 import SearchTextInput from '../SearchTextInput';
+import strings from '../Localization';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const date = new Date().toISOString().slice(0, 10);
 
@@ -32,35 +25,51 @@ const NewsScreen = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState('');
 
-  let url =
+  let arUrl =
     'https://newsapi.org/v2/everything?' +
     'q=Apple&' +
     'from=' +
     '' +
     date +
     '&' +
+    'language=ar&' +
+    'sortBy=popularity&' +
+    'apiKey=c5fb20aacb404653a7ceb53719e65f1c';
+  let enUrl =
+    'https://newsapi.org/v2/everything?' +
+    'q=Apple&' +
+    'from=' +
+    '' +
+    date +
+    '&' +
+    'language=en&' +
     'sortBy=popularity&' +
     'apiKey=c5fb20aacb404653a7ceb53719e65f1c';
 
-  let req = new Request(url);
+  let arReq = new Request(arUrl);
+  let enReq = new Request(enUrl);
 
   const wait = timeout => {
     return new Promise(resolve => setTimeout(resolve, timeout));
   };
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    fetchNews(req);
+    const lang = await AsyncStorage.getItem('@language');
+    if (lang === 'ar') {
+      fetchNews(arReq);
+    } else {
+      fetchNews(enReq);
+    }
     wait(2000).then(() => setRefreshing(false));
   }, []);
 
-  async function fetchNews(url) {
+  async function fetchNews(url: Request) {
     try {
       setRefreshing(true);
       await fetch(url)
         .then(response => response.json())
         .then(json => {
-          console.log('%c⧭', 'color: #731d1d', json);
           if (json.status === 'ok') {
             setNews(json.articles);
           } else {
@@ -74,14 +83,14 @@ const NewsScreen = ({navigation}) => {
   }
   useEffect(() => {
     if (isFocused) {
-      // fetchNews();
+      onRefresh();
     }
   }, [isFocused]);
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  function articleSelect(article) {
+  function articleSelect(article: Object) {
     navigation.navigate({
       name: 'ArticleScreen',
       params: {
@@ -90,8 +99,10 @@ const NewsScreen = ({navigation}) => {
     });
   }
 
-  function handleSearch(text: string) {
+  console.log('%c⧭', 'color: #f279ca', isDarkMode);
+  async function handleSearch(text: string) {
     setSearchText(text);
+    const lang = await AsyncStorage.getItem('@language');
     let searchUrl =
       'https://newsapi.org/v2/everything?' +
       'q=' +
@@ -101,6 +112,9 @@ const NewsScreen = ({navigation}) => {
       '' +
       date +
       '&' +
+      'language=' +
+      lang +
+      '&' +
       'sortBy=popularity&' +
       'apiKey=c5fb20aacb404653a7ceb53719e65f1c';
 
@@ -108,43 +122,53 @@ const NewsScreen = ({navigation}) => {
     if (text != '') {
       fetchNews(searchReq);
     } else {
-      fetchNews(req);
+      onRefresh();
     }
   }
 
+  function NewsList() {
+    return (
+      news.length != 0 &&
+      news.map(function (newItem, index: number) {
+        return (
+          <NewsComponent
+            selectFunction={() => articleSelect(newItem)}
+            key={String(index)}
+            author={newItem.author}
+            title={newItem.title}
+            description={newItem.description}
+            urlToImage={newItem.urlToImage}
+          />
+        );
+      })
+    );
+  }
+
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-      style={backgroundStyle}>
-      <SearchTextInput
-        style={styles.SearchBar}
-        onChangeText={text => handleSearch(text)}
-        placeholder={'Search'}
-        placeholderTextColor={'#999999'}
-        autoCorrect={false}
-        defaultValue={searchText}
-      />
-      {news.length != 0 &&
-        news.map(function (newItem, index) {
-          return (
-            <NewsComponent
-              selectFunction={() => articleSelect(newItem)}
-              key={String(index)}
-              author={newItem.author}
-              title={newItem.title}
-              description={newItem.description}
-              urlToImage={newItem.urlToImage}
-            />
-          );
-        })}
-      {news.length === 0 && (
-        <Text style={styles.noNewsStyle}>
-          {'No Articles Found\n\nPull page down to refresh'}
-        </Text>
+    <>
+      {!refreshing && (
+        <SearchTextInput
+          style={styles.SearchBar}
+          onChangeText={text => handleSearch(text)}
+          placeholder={strings.search}
+          placeholderTextColor={'black'}
+          autoCorrect={false}
+          defaultValue={searchText}
+        />
       )}
-    </ScrollView>
+      <ScrollView
+        contentContainerStyle={{justifyContent: 'center', flexGrow: 1}}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        style={backgroundStyle}>
+        {!refreshing && NewsList()}
+        {!refreshing && news.length === 0 && (
+          <Text style={styles.noNewsStyle}>{strings.NoArticles}</Text>
+        )}
+        {refreshing && <ActivityIndicator size="large" />}
+      </ScrollView>
+    </>
   );
 };
 export default NewsScreen;

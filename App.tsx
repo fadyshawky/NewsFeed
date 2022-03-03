@@ -6,38 +6,46 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import type {Node} from 'react';
 import {
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
   useColorScheme,
-  View,
 } from 'react-native';
 
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-import {NavigationContainer} from '@react-navigation/native';
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+} from '@react-navigation/native';
 
 import RootStack from './navigation/Navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import strings from './Localization';
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
+
+  async function getStorageItems() {
+    const lang = await AsyncStorage.getItem('@language');
+    if (lang) {
+      strings.setLanguage(lang);
+    }
+  }
+
+  useEffect(() => {
+    getStorageItems();
+  });
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={isDarkMode ? DarkTheme : DefaultTheme}>
       <SafeAreaView style={backgroundStyle} />
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       {RootStack()}
