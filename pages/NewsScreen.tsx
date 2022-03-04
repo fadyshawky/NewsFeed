@@ -55,6 +55,7 @@ const NewsScreen = ({navigation}: {navigation: any}) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+
     const lang = await AsyncStorage.getItem('@language');
     if (lang === 'ar') {
       fetchNews(arReq);
@@ -67,7 +68,6 @@ const NewsScreen = ({navigation}: {navigation: any}) => {
   async function fetchNews(url: Request) {
     try {
       setRefreshing(true);
-      setNews([]);
       await fetch(url)
         .then(response => response.json())
         .then(json => {
@@ -123,6 +123,8 @@ const NewsScreen = ({navigation}: {navigation: any}) => {
 
     let searchReq = new Request(searchUrl);
     if (text != '') {
+      setNews([]);
+
       fetchNews(searchReq);
     } else {
       onRefresh();
@@ -165,11 +167,11 @@ const NewsScreen = ({navigation}: {navigation: any}) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         style={backgroundStyle}>
-        {!refreshing && NewsList()}
+        {news.length != 0 && NewsList()}
         {!refreshing && news.length === 0 && (
           <Text style={styles.noNewsStyle}>{strings.NoArticles}</Text>
         )}
-        {refreshing && <ActivityIndicator size="large" />}
+        {refreshing && news.length === 0 && <ActivityIndicator size="large" />}
       </ScrollView>
     </>
   );

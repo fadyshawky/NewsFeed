@@ -1,23 +1,12 @@
 import React from 'react';
-import type {ReactNode} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   useColorScheme,
   TouchableOpacity,
   Image,
 } from 'react-native';
-import PropTypes from 'prop-types';
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 function NewsComponent(context: News) {
   const isDarkMode = useColorScheme() === 'dark';
