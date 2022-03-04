@@ -55,7 +55,7 @@ const NewsScreen = ({navigation}: {navigation: any}) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-
+    setNews([]);
     const lang = await AsyncStorage.getItem('@language');
     if (lang === 'ar') {
       fetchNews(arReq);
@@ -123,8 +123,6 @@ const NewsScreen = ({navigation}: {navigation: any}) => {
 
     let searchReq = new Request(searchUrl);
     if (text != '') {
-      setNews([]);
-
       fetchNews(searchReq);
     } else {
       onRefresh();
